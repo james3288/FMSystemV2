@@ -4,6 +4,7 @@ from sqlcon import SQLcon
 from .other_functions import ConvertToDate,ConvertToDateOnly, Time_Ago
 import os
 
+
 class Thumbnail_Images(models.Model):
     category = models.CharField('Category', max_length=200)
     thumbnail = models.ImageField(null=True,blank=True)
@@ -789,7 +790,9 @@ class Items():
 
         search = kwargs['item_code'].upper()
         info = kwargs['info'] 
+        
         borrower = []
+
         SQLCON = SQLcon()
         if SQLCON.has_connection() == True:
             cursor = SQLCON.connection()
@@ -992,5 +995,23 @@ class Items():
    
         return fac_item
         
+    def get_all_defective_items(self,**kwargs):
+        SQLCON = SQLcon()
+        fac_items = []
+
+        if SQLCON.has_connection() == True:
+            cursor = SQLCON.connection()
+ 
+            n = 333333
+            lof_search = 'Defective'
+            search = '' if kwargs.get('search') == 'undefined' else kwargs.get('search')
+
+            print('search',search)
+            cursor.execute("EXEC crud_wh_Facility_Maintenance @n=?, @lof_search=?, @search_3=?", (n, lof_search,search))
+            
+            f = cursor.fetchall()
+                
+        return f
+
 class NewItems():
     pass

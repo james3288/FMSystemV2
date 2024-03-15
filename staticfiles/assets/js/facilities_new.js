@@ -525,7 +525,7 @@ class RowStyle {
                             <a href="${repair_order_history_url}" class="btn btn-primary" style="width:100% !important;"> Repair Order History <span class="badge bg-white text-primary"> ${fac.no_of_repair_history}</span></a>                             
                         </div>
                         <div class="col-lg-12 p-1">
-                            <a href="${borrower_history_url}" class="btn btn-primary" style="width:100% !important;">Borrower History <span class="badge bg-white text-primary"> 0</span></a>                             
+                            <a href="${borrower_history_url}" class="btn btn-primary" style="width:100% !important;">Borrower History <span class="badge bg-white text-primary"> ${fac.no_of_borrowed}</span></a>                             
                         </div>
                     </div>          
                 </div>
@@ -551,12 +551,20 @@ class RowStyle {
                     <div class="card-title p-1 fs-6 text-white ${
                       fac.status_served_name == "Serve"
                         ? "badge bg-success"
-                        : fac.status_served_name == "Disposed"
+                        : fac.status_served_name == "Defective - Disposed"
                         ? "badge bg-danger"
-                        : fac.status_served_name == "For Disposal"
+                        : fac.status_served_name == "Defective - For Disposal"
                         ? "badge bg-danger"
                         : fac.status_served_name == "Vacant"
                         ? "badge bg-warning"
+                        : fac.status_served_name == "Defective - Serve"
+                        ? "badge bg-secondary"
+                        : fac.status_served_name == "Functional - Serve"
+                        ? "badge bg-success"
+                        : fac.status_served_name == "Disposed"
+                        ? "badge bg-danger"
+                        : fac.status_served_name == "Lost Item"
+                        ? "badge bg-secondary"
                         : ""
                     }">
                         ${fac.status_served_name}
@@ -1010,6 +1018,7 @@ class ListOfFacilities extends RowStyle {
   }
 
   async fetchData(search) {
+    // search is from inputfield
     this.spinnerbox.style.display = "block";
     this.search = search;
 

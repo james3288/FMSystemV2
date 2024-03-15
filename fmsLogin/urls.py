@@ -40,6 +40,7 @@ urlpatterns = [
                     path('LoadSupplierPriceUpdate/<int:visible>/<str:search>/', views.LoadSupplierPriceUpdate, name='load_supplier_price_update'),
                     path('facilities_new/<str:category>/<int:page>', views.FacilitiesPage_new, name='facilities_new'),
                     path('facilities_json/<str:category>/<int:visible>/<str:search>', views.Facilities_json, name='facilities_json'),
+                    path('get_all_defective/', views.get_all_defective, name='get_all_defective'),
                 ]
 
 

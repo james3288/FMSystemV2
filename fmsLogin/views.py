@@ -515,7 +515,6 @@ def RepairOrderRemove(request,**kwargs):
         response_data = {'success': True}
     return JsonResponse(response_data)
 
-
 def RepairTurnoverUpdatePage(request):
     if request.method == 'POST':
         form_data = request.POST  # Access the form data
@@ -849,77 +848,134 @@ def Facilities_json(request,**kwargs):
     if 'category' in kwargs:
         # get items class
         items = Items()
-
-        category = false_slugify[kwargs['category']] if kwargs['category']  in false_slugify else kwargs['category']
-
-        item_code = kwargs.get('item_code') if 'item_code' in kwargs else None
-
-
-        facilities  = items.Facilities_Item(category=kwargs['category'].replace("'","`"),item_code=item_code,search=search)
-        packages = items.Fac_Packages(category=None)
-        fac_size = len(facilities)
         
-        myImages = Thumbnail_Images.objects.all()
+        category    = false_slugify[kwargs['category']] if kwargs['category']  in false_slugify else kwargs['category']
+
+        item_code   = kwargs.get('item_code') if 'item_code' in kwargs else None
+
+
+        # get item facilities from database here
+        facilities:list
+
+        if(category == 'defective'):
+            # get all defective items
+            facilities  = items.get_all_defective_items(search=search)
+            
+        else:         
+            facilities  = items.Facilities_Item(category=kwargs['category'].replace("'","`"),item_code=item_code,search=search)
+
+        packages:list
+
+        packages    = items.Fac_Packages(category=None)
+  
+        fac_size    = len(facilities)
         
+        myImages    = Thumbnail_Images.objects.all()
+        
+        for img in myImages:
+            print(img.thumbnail.url)
+
         #Loop for Item Facilities
         facList = []
         packagesList = []  
 
         # manual serialization for facilities data
-        for x in list(facilities)[lower:upper]:
+        if(category == 'defective'):
+            for x in list(facilities)[lower:upper]:
+          
+                rs_no:str
+                                
+                rs_no = "None" if x.rs_no is None or x.rs_no.upper() == 'N/A' else x.rs_no
+
+                receiving = items.Receiving_History(rs_no = rs_no)
+
+                thumbnails = str(next((img.thumbnail.url for img in myImages if img.category == x.cat_name), None))
+                            
+                facList.append({
+                    'random_item_code_id': 0 if x.item_code_id == None else x.item_code_id,
+                    'item_code_id': 0 if x.item_code_id == None else x.item_code_id,
+                    'custodian_id': 0 if x.custodian_id == None else x.custodian_id,
+                    'item_code': "" if x.item_code == None else x.item_code,
+                    'item_name': "" if x.item_name == None else x.item_name,
+                    'item_name_desc_id': 0 if x.item_name_desc_id == None else x.item_name_desc_id,
+                    'category': "" if x.cat_name == None else x.cat_name,
+                    'brand': "" if x.brand == None else x.brand,
+                    'custodian_name': "" if x.custodian_name == None else x.custodian_name,
+                    'borrowed_for': "" if x.borrowed_for == None else x.borrowed_for,
+                    'status_served_name': "" if x.status_served_name == None else x.status_served_name,
+                    'date_schedule_final': "" if x.date_schedule_final == None else convertToDate(x.date_schedule_final),
+                    'last_date_maint': "" if x.last_date_maint == None else convertToDate(x.last_date_maint),
+                    'location': "" if x.location == None else x.location,
+                    'date_borrowed': "" if x.date_borrowed == None else convertToDate(x.date_borrowed),
+                    'acquisition_date': "",
+                    'rs_no': "" if x.rs_no == None else x.rs_no,
+                    'bs_no': "" if x.bs_no == None else x.bs_no,
+                    'serial_no': "",
+                    'search': f'{"" if x.item_name == None else x.item_name} {x.brand} {x.item_code} {x.cat_name} {x.custodian_name} {x.location} {x.rs_no} {x.bs_no} {x.borrowed_for}',
+                    'no_of_repair_history' : 0 if x.no_of_repair_history == None else x.no_of_repair_history,
+                    'repair_status': "" if x.repair_status == None else x.repair_status,
+                    'receiving_data': receiving,
+                    'no_of_borrowed': len(items.MTO(item_code=x.item_code)), 
+                    'img': 'default.jpg' if thumbnails == None else thumbnails,
+                    'time_ago': Time_Ago('-' if x.date_borrowed == None else x.date_borrowed),
+                })   
+     
+        else:
+            for x in list(facilities)[lower:upper]:
             # random_number = f'{x.item_code_id}{generate_random_letters(5)}'
-    
-            rs_no = "None" if x.rs_no is None or x.rs_no.upper() == 'N/A' else x.rs_no
+                rs_no:str
+                thumbnails:str
 
-            receiving = items.Receiving_History(rs_no = rs_no)
+                rs_no = "None" if x.rs_no is None or x.rs_no.upper() == 'N/A' else x.rs_no
 
-            thumbnails = str(next((img.thumbnail.url for img in myImages if img.category == x.category), None))
-                        
-                # rs_no = None 
-                # if x.rs_no == None:
-                #     rs_no = "None"
-                # elif x.rs_no.upper() == 'N/A':
-                #     rs_no = "None"
-                # else:
-                #     rs_no = x.rs_no
+                receiving = items.Receiving_History(rs_no = rs_no)
 
-
-                # thumbnails = None
-                # for img in myImages:
-                #     if img.category == x.category:
-                #         thumbnails = str(img.thumbnail.url)
+                thumbnails = str(next((img.thumbnail.url for img in myImages if img.category == x.category), None))
+                            
+                    # rs_no = None 
+                    # if x.rs_no == None:
+                    #     rs_no = "None"
+                    # elif x.rs_no.upper() == 'N/A':
+                    #     rs_no = "None"
+                    # else:
+                    #     rs_no = x.rs_no
 
 
-            facList.append({
-                'random_item_code_id': 0 if x.item_code_id == None else x.item_code_id,
-                'item_code_id': 0 if x.item_code_id == None else x.item_code_id,
-                'custodian_id': 0 if x.custodian_id == None else x.custodian_id,
-                'item_code': "" if x.item_code == None else x.item_code,
-                'item_name': "" if x.item_name == None else x.item_name,
-                'item_name_desc_id': 0 if x.item_name_desc_id == None else x.item_name_desc_id,
-                'category': "" if x.category == None else x.category,
-                'brand': "" if x.brand == None else x.brand,
-                'custodian_name': "" if x.custodian_name == None else x.custodian_name,
-                'borrowed_for': "" if x.borrowed_for == None else x.borrowed_for,
-                'status_served_name': "" if x.status_served_name == None else x.status_served_name,
-                'date_schedule_final': "" if x.date_schedule_final == None else convertToDate(x.date_schedule_final),
-                'last_date_maint': "" if x.last_date_maint == None else convertToDate(x.last_date_maint),
-                'location': "" if x.location == None else x.location,
-                'date_borrowed': "" if x.date_borrowed == None else convertToDate(x.date_borrowed),
-                'acquisition_date': "" if x.acquisition_date == None else convertToDate(x.acquisition_date),
-                'rs_no': "" if x.rs_no == None else x.rs_no,
-                'bs_no': "" if x.bs_no == None else x.bs_no,
-                'serial_no': "" if x.serial_no == None else x.serial_no,
-                'search': f'{"" if x.item_name == None else x.item_name} {x.brand} {x.item_code} {x.category} {x.custodian_name} {x.location} {x.rs_no} {x.bs_no} {x.borrowed_for}',
-                'no_of_repair_history' : 0 if x.no_of_repair_history == None else x.no_of_repair_history,
-                'repair_status':"" if x.repair_status == None else x.repair_status,
-                'receiving_data': receiving,
-                'no_of_borrowed': len(items.MTO(item_code=x.item_code)), 
-                'img': 'default.jpg' if thumbnails == None else thumbnails,
-                'time_ago': Time_Ago('-' if x.date_borrowed == None else x.date_borrowed),
-            })
+                    # thumbnails = None
+                    # for img in myImages:
+                    #     if img.category == x.category:
+                    #         thumbnails = str(img.thumbnail.url)
 
-         
+
+                facList.append({
+                    'random_item_code_id': 0 if x.item_code_id == None else x.item_code_id,
+                    'item_code_id': 0 if x.item_code_id == None else x.item_code_id,
+                    'custodian_id': 0 if x.custodian_id == None else x.custodian_id,
+                    'item_code': "" if x.item_code == None else x.item_code,
+                    'item_name': "" if x.item_name == None else x.item_name,
+                    'item_name_desc_id': 0 if x.item_name_desc_id == None else x.item_name_desc_id,
+                    'category': "" if x.category == None else x.category,
+                    'brand': "" if x.brand == None else x.brand,
+                    'custodian_name': "" if x.custodian_name == None else x.custodian_name,
+                    'borrowed_for': "" if x.borrowed_for == None else x.borrowed_for,
+                    'status_served_name': "" if x.status_served_name == None else x.status_served_name,
+                    'date_schedule_final': "" if x.date_schedule_final == None else convertToDate(x.date_schedule_final),
+                    'last_date_maint': "" if x.last_date_maint == None else convertToDate(x.last_date_maint),
+                    'location': "" if x.location == None else x.location,
+                    'date_borrowed': "" if x.date_borrowed == None else convertToDate(x.date_borrowed),
+                    'acquisition_date': "" if x.acquisition_date == None else convertToDate(x.acquisition_date),
+                    'rs_no': "" if x.rs_no == None else x.rs_no,
+                    'bs_no': "" if x.bs_no == None else x.bs_no,
+                    'serial_no': "" if x.serial_no == None else x.serial_no,
+                    'search': f'{"" if x.item_name == None else x.item_name} {x.brand} {x.item_code} {x.category} {x.custodian_name} {x.location} {x.rs_no} {x.bs_no} {x.borrowed_for}',
+                    'no_of_repair_history' : 0 if x.no_of_repair_history == None else x.no_of_repair_history,
+                    'repair_status':"" if x.repair_status == None else x.repair_status,
+                    'receiving_data': receiving,
+                    'no_of_borrowed': len(items.MTO(item_code=x.item_code)), 
+                    'img': 'default.jpg' if thumbnails == None else thumbnails,
+                    'time_ago': Time_Ago('-' if x.date_borrowed == None else x.date_borrowed),
+                })
+            
         # manual serialization for packages data
         for x in packages:
             packagesList.append({
@@ -1027,3 +1083,13 @@ def RepairOrderHistory_json(request,**kwargs):
                    }
 
     return JsonResponse(context)
+
+def get_all_defective(request):
+    items = Items()
+    if request.method == 'GET':
+        defective_items = items.get_all_defective_items()
+        
+        print(defective_items)
+
+
+    return JsonResponse({"message":"hello"})
