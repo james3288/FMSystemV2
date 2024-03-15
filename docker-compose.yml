@@ -1,0 +1,13 @@
+version: "25.0.2"
+services:
+  app:
+   build: .
+   volumes:
+    - .:/fms
+   ports:
+    - 8000:8000
+   image: application:fms
+   container_name: app_container
+   command: gunicorn FMS.wsgi:application --bind 0.0.0.0:8000
+  
+  

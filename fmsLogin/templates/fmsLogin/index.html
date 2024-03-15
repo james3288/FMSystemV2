@@ -1,0 +1,669 @@
+{% extends 'base/base.html' %} {% load static %} {% block title %}
+<title>FMS - Dashboard</title>
+{% endblock %} {% block content %}
+<!-- Borrowed Card -->
+<div class="col-xxl-4 col-md-6">
+  <div class="card info-card sales-card">
+    <div class="filter">
+      <a class="icon" href="#" data-bs-toggle="dropdown"
+        ><i class="bi bi-three-dots"></i
+      ></a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <li class="dropdown-header text-start">
+          <h6>Filter</h6>
+        </li>
+
+        <li><a class="dropdown-item" href="#">Today</a></li>
+        <li><a class="dropdown-item" href="#">This Month</a></li>
+        <li><a class="dropdown-item" href="#">This Year</a></li>
+      </ul>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">BORROWED <span>| This Year</span></h5>
+
+      <div class="d-flex align-items-center">
+        <div
+          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+        >
+          <!-- <a
+            href="{% url 'borrowed' category='borrowed-items'|slugify page=1 %}"
+            style="color: blue"
+            ><i class="bi-file-earmark-plus"></i
+          ></a> -->
+          <a
+            href="{% url 'facilities_new' category='all'|slugify page=1 %}"
+            style="color: blue"
+            ><i class="bi-file-earmark-plus"></i
+          ></a>
+        </div>
+        <div class="ps-3">
+          <h6 id="borrowed_id">{{ borrowed }}</h6>
+          <span class="text-success small pt-1 fw-bold">{{ borrowed }}%</span>
+          <span class="text-muted small pt-2 ps-1">increase</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Borrowed Card -->
+
+<!-- Repaired Card -->
+<div class="col-xxl-4 col-md-6">
+  <div class="card info-card revenue-card">
+    <div class="filter">
+      <a class="icon" href="#" data-bs-toggle="dropdown"
+        ><i class="bi bi-three-dots"></i
+      ></a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <li class="dropdown-header text-start">
+          <h6>Filter</h6>
+        </li>
+
+        <li><a class="dropdown-item" href="#">Today</a></li>
+        <li><a class="dropdown-item" href="#">This Month</a></li>
+        <li><a class="dropdown-item" href="#">This Year</a></li>
+      </ul>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">UNDER REPAIR <span>| Today </span></h5>
+
+      <div class="d-flex align-items-center">
+        <div
+          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+        >
+          <a
+            href="{% url 'under-repair' category='under-repair-items'|slugify item_code='All' %}"
+            style="color: green"
+            ><i class="bi-tools"></i
+          ></a>
+        </div>
+        <div class="ps-3">
+          <h6 id="repaired_id">{{repaired}}</h6>
+          <span class="text-success small pt-1 fw-bold">{{ repaired }}%</span>
+          <span class="text-muted small pt-2 ps-1">increase</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Repaired Card -->
+
+<!-- Item Vacant Card -->
+<div class="col-xxl-4 col-md-6">
+  <div class="card info-card customers-card">
+    <div class="filter">
+      <a class="icon" href="#" data-bs-toggle="dropdown"
+        ><i class="bi bi-three-dots"></i
+      ></a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <li class="dropdown-header text-start">
+          <h6>Filter</h6>
+        </li>
+
+        <li><a class="dropdown-item" href="#">Today</a></li>
+        <li><a class="dropdown-item" href="#">This Month</a></li>
+        <li><a class="dropdown-item" href="#">This Year</a></li>
+      </ul>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">ITEM VACANT <span>| This Year</span></h5>
+
+      <div class="d-flex align-items-center">
+        <div
+          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+        >
+          <a
+            href="{% url 'vacant' category='vacant'|slugify page=1 %}"
+            style="color: orangered"
+            ><i class="bi-bag-plus-fill"></i
+          ></a>
+        </div>
+        <div class="ps-3">
+          <h6 id="vacant_id">{{ vacant }}</h6>
+          <span class="text-success small pt-1 fw-bold">{{ vacant }}%</span>
+          <span class="text-muted small pt-2 ps-1">increase</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Item Vacant Card -->
+
+<!-- Item Defective Card -->
+<div class="col-xxl-4 col-md-6">
+  <div class="card info-card customers-card">
+    <div class="filter">
+      <a class="icon" href="#" data-bs-toggle="dropdown"
+        ><i class="bi bi-three-dots"></i
+      ></a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+        <li class="dropdown-header text-start">
+          <h6>Filter</h6>
+        </li>
+
+        <li><a class="dropdown-item" href="#">Today</a></li>
+        <li><a class="dropdown-item" href="#">This Month</a></li>
+        <li><a class="dropdown-item" href="#">This Year</a></li>
+      </ul>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">ITEM DEFECTIVE <span>| This Year</span></h5>
+
+      <div class="d-flex align-items-center">
+        <div
+          class="card-icon rounded-circle d-flex align-items-center justify-content-center"
+          style="background-color: lightgray !important;"
+        >
+          <!-- <a
+            href="{% url 'defective' category='defective'|slugify page=1 %}"
+            style="color: chocolate"
+            ><i class="ri-recycle-fill"></i
+          ></a> -->
+
+          <a
+            href="{% url 'facilities_new' category='defective'|slugify page=1 %}"
+            style="color: gray"
+            ><i class="bi-trash-fill"></i
+          ></a>
+        </div>
+        <div class="ps-3">
+          <h6 id="defective_id">{{ defective }}</h6>
+          <span class="text-success small pt-1 fw-bold">{{ defective }}%</span>
+          <span class="text-muted small pt-2 ps-1">increase</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Item Defective Card -->
+
+<!-- Supplier Price Update Card -->
+<div class="col-12">
+  <div class="card top-selling overflow-auto">
+    <div class="filter">
+      <a class="icon" href="#" data-bs-toggle="dropdown"
+        ><i class="bi bi-three-dots"></i
+      ></a>
+      <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow"></ul>
+    </div>
+
+    <div class="card-body pb-0">
+      <h5 class="card-title">Supplier Price Update <span>| Today</span></h5>
+      <div class="card info-card customers-card" id="listofpriceid"></div>
+    </div>
+
+    <div class="container" id="loadingID2">
+      <div class="wrapper">
+        <div class="wrapper-cell">
+          <div class="image animated-background"></div>
+          <div class="text">
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Supplier Price Update Card -->
+
+<!-- Script for Dashboard and Supplier Price Update -->
+<script>
+  $(document).ready(function () {
+    //setInterval(function(){
+    $.ajax({
+      type: "GET",
+      url: "/dashboard",
+      success: function (response) {
+        const repaired = document.getElementById("repaired_id");
+        const borrowed = document.getElementById("borrowed_id");
+        const vacant = document.getElementById("vacant_id");
+        const defective = document.getElementById("defective_id");
+        //const updated_price = document.getElementById("updatedpriceid")
+        const path = '{% static "assets/img/computer.png" %}';
+        const list_of_updated_price = document.getElementById("listofpriceid");
+        const supplier_price_update_url = "/supplier_price_update/";
+
+        fetch(path)
+          .then((response) => {
+            if (response.ok) {
+              console.log("The file exists.");
+            } else {
+              console.log("The file does not exist.");
+            }
+          })
+          .catch((error) => {
+            console.error("An error occurred:", error);
+          });
+
+        repaired.innerText = response.dashboard_data.repaired;
+        borrowed.innerText = response.dashboard_data.borrowed;
+        vacant.innerHTML = response.dashboard_data.vacant;
+        defective.innerHTML = response.dashboard_data.defective;
+        list_of_updated_price.innerHTML = "";
+        counter = 0;
+
+        response.updated_price.forEach(function (item) {
+          if (Object.keys(item).length === 0) {
+            //console.log("The dictionary is empty.");
+          } else {
+            // console.log("The dictionary is not empty.");
+            // console.log(item[0].supplier)
+
+            const served_url = `/served/borrowed-items/1/${item[0].item_code}`;
+
+            list_of_updated_price.innerHTML += `
+
+                    <a href="${served_url}" class="list-group-item list-group-item-action" aria-current="true">
+                      <div class="d-flex w-100 justify-content-between">
+                          <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">${item[0].item_name} - ${item[0].items} </h5>
+                          <small>${item[0].date}</small>
+                      </div>
+                      <p class="mb-1"><span class="badge bg-primary price_font" style="font-size:100% !important">${item[0].price}</span></p>
+                      <small>RS NO: ${item[0].rs_no}</small>
+                      <br/><small>SUPPLIER: ${item[0].supplier}</small>
+                      <br/><small>Type of Purchasing: ${item[0].type_of_purchasing}</small>
+                      <br/><small>Item Code: ${item[0].item_code}</small>
+                    </a>`;
+            counter += 1;
+          }
+        });
+        //console.log(response.updated_price)
+        if (counter == 0) {
+          list_of_updated_price.innerHTML += `<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                                    No items has been found!                                               
+                                                </div>`;
+        } else {
+          list_of_updated_price.innerHTML += `<a href="${supplier_price_update_url}" class="btn btn-info btn-xs m-2 p-0 fs-6" style="width:120px !important">Load More</a>`;
+        }
+
+        const loading = document.getElementById("loadingID2");
+        loading.style.display = "none";
+      },
+      error: function (response) {
+        console.log("error occured!");
+      },
+    });
+  }, 3000);
+
+  //   const dashboard = new Dashboard();
+  //   const borrowed  = dashboard.indexData.bind(dashboard);
+
+  //   borrowed().then(data => {
+  //     const list_of_updated_price = document.getElementById("listofpriceid")
+
+  //     up = data.updated_price;
+  //     up.forEach(price => {
+  //       list_of_updated_price.innerHTML += `<a href="#" class="list-group-item list-group-item-action" aria-current="true">
+  //                     <div class="d-flex w-100 justify-content-between">
+  //                         <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">${price[0].item_name} - ${ price[0].items } </h5>
+  //                         <small>${ price[0].date }</small>
+  //                     </div>
+  //                     <p class="mb-1"><span class="badge bg-primary price_font" style="font-size:100% !important">${ price[0].price }</span></p>
+  //                     <small>RS NO: ${ price[0].rs_no }</small>
+  //                     <br/><small>SUPPLIER: ${ price[0].supplier}</small>
+  //                     <br/><small>Type of Purchasing: ${price[0].type_of_purchasing}</small>
+  //                     <br/><small>Item Code: ${price[0].item_code}</small>
+  //                   </a>`;
+  //     });
+
+  //   }).catch(error => {
+  //       console.error(error);
+  //   });
+  // });
+</script>
+<!-- end script for dashboard -->
+
+{% endblock %} {% block activity %}
+<!-- RECENT ACTIVITY -->
+<div class="card">
+  <div class="filter">
+    <a class="icon" href="#" data-bs-toggle="dropdown"
+      ><i class="bi bi-three-dots"></i
+    ></a>
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+      <li class="dropdown-header text-start">
+        <h6>Filter</h6>
+      </li>
+
+      <li><a class="dropdown-item" href="#">Today</a></li>
+      <li><a class="dropdown-item" href="#">This Month</a></li>
+      <li><a class="dropdown-item" href="#">This Year</a></li>
+    </ul>
+  </div>
+
+  <div class="card-body">
+    <h5 class="card-title">Recent Activity <span>| Today</span></h5>
+
+    <div
+      class="container"
+      id="loadingID"
+      style="display: flex; align-items: center; justify-content: center"
+    >
+      <div class="wrapper">
+        <div class="wrapper-cell">
+          <div class="image animated-background"></div>
+          <div class="text">
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+          </div>
+        </div>
+        <div class="wrapper-cell">
+          <div class="image animated-background"></div>
+          <div class="text">
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+          </div>
+        </div>
+        <div class="wrapper-cell">
+          <div class="image animated-background"></div>
+          <div class="text">
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+          </div>
+        </div>
+        <div class="wrapper-cell">
+          <div class="image animated-background"></div>
+          <div class="text">
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+            <div class="text-line animated-background"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="d-flex justify-content-center">
+        <div class="spinner-border text-primary" role="status" id="loadingID">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div> -->
+
+    <div class="activity" id="activity_id"></div>
+  </div>
+</div>
+<!-- recent activity script -->
+<script>
+  $(document).ready(function () {
+    setInterval(function () {
+      $.ajax({
+        type: "GET",
+        url: "/recent_activities",
+        success: function (response) {
+          const activity_container = document.getElementById("activity_id");
+
+          activity_container.innerHTML = "";
+
+          response.recent_activities.forEach((element) => {
+            //console.log(element.brand)
+            const url =
+              "{% url 'under-repair' category='under-repair-items'|slugify item_code='All' %}";
+
+            result = `<div class="activity-item d-flex">`;
+            result += `<div class="activite-label">${element.date_log}</div>`;
+
+            //TURNOVER
+            if (element.status == "Turn-over") {
+              result += `<i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="#" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> by: ${element.custodian_name}</div>`;
+            }
+
+            //UNDER-REPAIR
+            else if (element.status == "Under-Repair") {
+              var my_path =
+                "/under-repair/under-repair-items/" +
+                element.item_code.toUpperCase();
+
+              result += `<i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="${my_path}" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> Received by: <span style="color:gray;">${element.custodian_name}</span></div>`;
+            }
+
+            // SERVED
+            else if (element.status == "Serve") {
+              var my_path =
+                "/served/borrowed-items/1/" + element.item_code.toUpperCase();
+
+              result += `<i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="${my_path}" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> Custodian: <span style="color:gray;">${element.custodian_name}</span></div>`;
+            }
+
+            //VACANT
+            else if (element.status == "Vacant") {
+              result += `<i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="{% url 'vacant' category='vacant'|slugify page=1 %}" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> Custodian: ${element.custodian_name}</div>`;
+            }
+
+            // FOR DISPOSAL
+            else if (element.status == "For Disposal") {
+              result += `<i class='bi bi-circle-fill activity-badge text-secondary align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="{% url 'defective' category='defective'|slugify page=1 %}" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> Custodian: ${element.custodian_name}</div>`;
+            }
+
+            //REPAIRED
+            else if (element.status == "Repaired") {
+              var my_path =
+                "/under-repair/under-repair-items/" +
+                element.item_code.toUpperCase();
+
+              result += `<i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>`;
+              result += `<div class="activity-content">${element.status} <a href="${my_path}" class="fw-bold text-dark"> ${element.item_name} - ${element.brand} </a> Repaired by: <span style="color:gray;">${element.custodian_name}</span></div>`;
+            }
+            result += `</div>`;
+
+            activity_container.innerHTML += result;
+          });
+
+          //LOAD MORE BUTTON
+          activity_container.innerHTML += `<a class="btn" style="background-color: #002349 !important; width: 100% !important; padding:0px !important" href="{% url 'recent_activities_history' %}" id="loadmoreactivityid"><small class="card-body" style="color:white !important; padding:3px !important">Load More Activities</small></a>`;
+
+          const loading = document.getElementById("loadingID");
+          loading.style.display = "none";
+        },
+        error: function (response) {
+          console.log("error occured!");
+        },
+      });
+    }, 3000);
+
+    function timeAgo(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffInSeconds = Math.floor((now - date) / 1000);
+
+      if (diffInSeconds < 60) {
+        return `${diffInSeconds} seconds ago`;
+      } else if (diffInSeconds < 3600) {
+        const minutes = Math.floor(diffInSeconds / 60);
+        return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+      } else if (diffInSeconds < 86400) {
+        const hours = Math.floor(diffInSeconds / 3600);
+        return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+      } else if (diffInSeconds < 604800) {
+        const days = Math.floor(diffInSeconds / 86400);
+        return `${days} day${days > 1 ? "s" : ""} ago`;
+      } else if (diffInSeconds < 2419200) {
+        const weeks = Math.floor(diffInSeconds / 604800);
+        return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
+      } else if (diffInSeconds < 29030400) {
+        const months = Math.floor(diffInSeconds / 2419200);
+        return `${months} month${months > 1 ? "s" : ""} ago`;
+      } else {
+        const years = Math.floor(diffInSeconds / 29030400);
+        return `${years} year${years > 1 ? "s" : ""} ago`;
+      }
+    }
+  });
+</script>
+<!-- recent activity script -->
+{% endblock %} {% block charts %}
+<!-- Website Traffic -->
+<div class="card">
+  <div class="filter">
+    <a class="icon" href="#" data-bs-toggle="dropdown"
+      ><i class="bi bi-three-dots"></i
+    ></a>
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+      <li class="dropdown-header text-start">
+        <h6>Filter</h6>
+      </li>
+
+      <li><a class="dropdown-item" href="#">Today</a></li>
+      <li><a class="dropdown-item" href="#">This Month</a></li>
+      <li><a class="dropdown-item" href="#">This Year</a></li>
+    </ul>
+  </div>
+
+  <!-- Radial Bar Chart -->
+  <div class="card-body pb-0">
+    <h5 class="card-title">
+      Computer Maintenance Cleaning <span>| This Year</span>
+    </h5>
+    <div id="radialBarChart"></div>
+    <div class="mb-3">
+      <!-- <button type="button" class="btn btn-danger" style="width:100% !important; padding:3px !important; margin-bottom: 5px !important">View More</button> -->
+      <a
+        class="btn"
+        style="
+          background-color: #002349 !important;
+          width: 100% !important;
+          padding: 0px !important;
+        "
+        href="{% url 'computer_maintenance' %}"
+        id="loadmoreactivityid"
+        ><small
+          class="card-body"
+          style="color: white !important; padding: 3px !important"
+          >View More</small
+        ></a
+      >
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        new ApexCharts(document.querySelector("#radialBarChart"), {
+          series: [44, 55, 67, 83, 100, 20],
+          chart: {
+            height: 350,
+            type: "radialBar",
+            toolbar: {
+              show: true,
+            },
+          },
+          plotOptions: {
+            radialBar: {
+              dataLabels: {
+                name: {
+                  fontSize: "22px",
+                },
+                value: {
+                  fontSize: "16px",
+                },
+                total: {
+                  show: true,
+                  label: "Total",
+                  formatter: function (w) {
+                    // By default this function returns the average of all series. The below is just an example to show the use of custom formatter function
+
+                    let total = 0;
+                    w.config.series.forEach(function (series) {
+                      total += parseInt(series);
+                    });
+                    return total;
+                  },
+                },
+              },
+            },
+          },
+          labels: ["ACC", "ITD", "PCM", "EMD", "SUPPLY", "BIDDING"],
+        }).render();
+      });
+    </script>
+  </div>
+
+  <!-- End Radial Bar Chart -->
+
+  <!-- <div class="card-body pb-0">
+        <h5 class="card-title">Computer Maintenance Cleaning <span>| Today</span></h5>
+
+        <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", () => {
+            echarts.init(document.querySelector("#trafficChart")).setOption({
+              tooltip: {
+                trigger: 'item'
+              },
+              legend: {
+                top: '5%',
+                left: 'center'
+              },
+              series: [{
+                name: 'Access From',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                label: {
+                  show: false,
+                  position: 'center'
+                },
+                emphasis: {
+                  label: {
+                    show: true,
+                    fontSize: '18',
+                    fontWeight: 'bold'
+                  }
+                },
+                labelLine: {
+                  show: false
+                },
+                data: [{
+                    value: 10,
+                    name: 'January'
+                  },
+                  {
+                    value: 10,
+                    name: 'February'
+                  },
+                  {
+                    value: 10,
+                    name: 'March'
+                  },
+                  {
+                    value: 10,
+                    name: 'April'
+                  },
+                  {
+                    value: 10,
+                    name: 'May'
+                  },
+                  {
+                    value: 10,
+                    name: 'June'
+                  },
+                  {
+                    value: 10,
+                    name: 'July'
+                  }
+                ]
+              }]
+            });
+          });
+        </script>
+
+      </div>
+    </div>End Website Traffic -->
+</div>
+<!-- End Right side columns -->
+{% endblock %}

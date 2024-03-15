@@ -1,0 +1,382 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - List Of Facilities</title>
+{% endblock %}
+
+{% block content %}
+
+    <!-- <div class="pagetitle">
+        <h1>{{pages}}</h1>
+        <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+            <li class="breadcrumb-item active">{{ category }}</li>          
+        </nav>  
+    </div>End Page Title -->
+
+<!-- Javascript for facilities -->
+<script>
+    
+    const data          = '{{ qs_json }}'
+    const category      = '{{ category }}'
+
+    const decodedData   = data.replace(/&#x27;/g, "'").replace(/&quot;/g, '"')
+    const jsonData      = decodedData.replace(/'/g, '"')  // Optional: Replace single quotes with double quotes
+    const parsedData    = JSON.parse(jsonData)
+
+    const input         = document.getElementById('search-bar-id')
+    const box           = document.getElementById('box')
+    const row           = document.getElementById('rowID')
+    const cardbody      = document.getElementById('cardbodyID')
+
+    const no_of_borrowed_history = '{{ no_of_borrowed_history }}'
+
+    // Set the delay time (in milliseconds) for the debounce function
+    const delayTime     = 600; // Adjust the delay time as needed
+
+    //thumbnail
+    // console.log(parsedData)
+
+    let filteredArr = []
+
+    // THIS FUNCTION IS FOR SEARCH BAR
+    function handleKeyUp(e) {
+        var counter = 0;
+        row.innerHTML = "<div id='csrfData' data-csrf='{{ csrf_token }}'></div>";
+        // Your existing code for filtering and displaying results...
+        // ... (omitted for brevity)
+      
+        parsedData.qs_json.forEach(item => {       
+            
+            if(item.search.toUpperCase().includes(e.target.value.toUpperCase())){            
+
+                if (item.category == category){
+                row.innerHTML += Result(item,category)
+                counter += 1
+            
+                } else if(category == 'Borrowed Items' &&  item.status_served_name == 'Serve'){
+
+                    row.innerHTML += Result(item,category)
+                    counter += 1
+
+                } else if (category == 'Vacant' && item.status_served_name == 'Vacant'){
+                    row.innerHTML += Result(item,category)
+                    counter += 1       
+
+                } else if (category == 'Defective' && item.status_served_name == 'For Disposal'){
+                    row.innerHTML += Result(item,category)
+                    counter += 1    
+                    
+                }
+            }
+        
+            // if(e.target.value == ''){
+            //     row.innerHTML = ""
+            // }    
+        })  
+
+        if (counter === 0) {
+            row.innerHTML += myAlert('No items have been found!');
+        }else{
+            row.innerHTML += `<a class="btn" style="background-color: #002349 !important" href=""><small class="card-title" style="color:white !important;">Load More</small></a>`
+        }
+
+        // const spinnerID = document.getElementById('spinnerID')
+        // spinnerID.remove()
+    }
+
+    // Define a debouncing function to limit the rate of function execution
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // GET SUBITEM HISTORY
+    function GetSubItemHistory(subitem_id){
+        const id = subitem_id.replace("subitem_","")
+
+        fetch(`/subitem_history/${id}`, {
+        method: 'GET',
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+            return response.json() // Parse the response body as JSON
+        })
+        .then(function(data) {
+            // Process the JSON data returned from the Django view
+
+            const subhistory = data.subitemhistory
+            const subitemlist = document.getElementById('SubItemListId')
+            
+            subitemlist.innerHTML = ""
+
+            subhistory.forEach(function(subitem){
+
+                subitemlist.innerHTML += `<a href="#" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h5 class="mb-1">${subitem.item_code}</h5>
+                                                <small class="text-muted"></small>
+                                            </div>
+                                            <p class="mb-1">${subitem.item_name} - ${subitem.brand}</p>
+                                            <small class="text-muted">Custodian: ${subitem.custodian}</small><br/>
+                                            <small class="text-muted">Location: ${subitem.borrowed_for}</small>                                      
+                                        </a>`
+            })
+        })
+        .catch(function(error) {
+            console.log('Error:', error)
+        })
+    }
+
+    // PAGE LOAD FIRST
+    document.addEventListener('DOMContentLoaded', function() {
+        var counter = 0
+    
+        row.innerHTML = "<div id='csrfData' data-csrf='{{ csrf_token }}'></div>"
+
+         // Using a forEach loop to get data from parsedData 
+        parsedData.qs_json.forEach(item => {       
+        
+            if (item.category == category){
+                row.innerHTML += Result(item,category)
+                counter += 1
+            
+            } 
+            else if(category == 'Borrowed Items' &&  item.status_served_name == 'Serve'){
+                
+                const item_code = '{{ item_code }}'      
+
+                if (item.item_code.toUpperCase() == item_code.toUpperCase() && item_code != 'None'){
+
+                    row.innerHTML += Result(item,category)
+                    counter += 1
+                
+                } 
+                else if(item_code == 'None'){
+
+                    row.innerHTML += Result(item,category)
+                    counter += 1
+                }
+          
+            } 
+            else if (category == 'Vacant' && item.status_served_name == 'Vacant'){
+                row.innerHTML += Result(item,category)
+                counter += 1       
+            } 
+            else if (category == 'Defective' && item.status_served_name == 'For Disposal'){
+                row.innerHTML += Result(item,category)
+                counter += 1    
+
+            }
+        
+            // create a click function for each SubItems
+        
+        })  
+        
+        // if wlay items makita!
+        if(counter == 0){
+            row.innerHTML += myAlert('No items has been found!')
+        }else{
+            row.innerHTML += `<a class="btn" style="background-color: #002349 !important" href="" id="loadmoreid"><small class="card-title" style="color:white !important;">Load More</small></a>`
+        } 
+
+        const loadmore = document.getElementById("loadmoreid")
+    
+        loadmore.addEventListener("click", function(e){
+            e.preventDefault()
+
+        })
+    })
+
+    // Add the debouncing to the keyup event listener
+    input.addEventListener('keyup', debounce(handleKeyUp, delayTime));
+
+    // // kung mag type sa search bar
+    // input.addEventListener('keyup',(e)=>{
+    //     var counter = 0
+    //     // Using a forEach loop
+    //     row.innerHTML = ""
+    //     parsedData.qs_json.forEach(item => {       
+            
+    //         if(item.search.toUpperCase().includes(e.target.value.toUpperCase())){            
+    //             if (category == item.category){
+                    
+    //                 row.innerHTML += Result(item,category)
+    //                 counter += 1
+
+    //             }
+    //         }
+        
+    //         // if(e.target.value == ''){
+    //         //     row.innerHTML = ""
+    //         // }    
+    //     })  
+        
+    //     if(counter == 0){
+    //         row.innerHTML += myAlert('No items has been found!')
+    //     }
+    //     //row.innerHTML +=  DialogBox(item)
+
+    // })
+
+
+
+    // this function is for list of facilities filtered
+    function Result(item,param_category) {
+
+        const category              = item.category//'{{ category }}'
+        const slug_category         = slugify(item.category)
+        const url                   = '/repair_order_history/' + slugify(category) + '/' + item.item_code.toUpperCase();
+        const borrower_history_url  = '/borrower_history/' + slugify(item.item_code).toUpperCase(); 
+
+        console.log(item.date_schedule_final)
+
+        let result = ``  
+            result += `<div class="card">`
+                result += `<div class="card-body" id="cardbodyID" style="padding-right:0px !important; padding-left:0px !important"><br/>`
+                    //result += `<h5 class="card-title">${ category }</h5>`
+                    result+=`<div class="card mb-3">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="${item.img}" class="img-fluid rounded-start" alt="..." onerror="this.src='{% static 'assets/img/coming_soon.jpg' %}'">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${ category.toUpperCase() }</h5>
+                                            <p class="card-title" style="margin-bottom: -1.25rem !important"><i class="ri-checkbox-multiple-fill"></i> ${ item.item_name } - ${ item.brand }</p>
+                                            <p class= "card-body">
+                                                <span class="${item.status_served_name == 'Serve' ? 'badge bg-success': item.status_served_name == 'Disposed' ? 'badge bg-danger': item.status_served_name == 'For Disposal' ? 'badge bg-danger': item.status_served_name == 'Vacant' ? 'badge bg-warning': ''}" style="margin-right:2px">
+                                                    ${ item.status_served_name }
+                                                </span>
+                                                <span class="${item.repair_status == 'Repaired' ? 'badge bg-success': item.repair_status == 'On-going Repair' ? 'badge bg-danger': ''}">
+                                                    ${item.repair_status}
+                                                </span>
+                                                <span class="badge bg-info">Custodian: ${item.custodian_name}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                            
+
+                    result += `<div class="card" id="cardID">`
+                        result += `<div class="card-header" style="margin-bottom:10px;">${ item.item_code }</div>`
+                        result += `<div class="card-body">`
+                        //result += `<h5 class="card-title"><i class="ri-checkbox-multiple-fill"></i> ${ item.item_name } - ${ item.brand }</h5>`
+                        result += `<ul class="list-group">`
+ 
+                        if (item.category == category){
+                            const package = '{{ qs_json2 }}'
+
+                            const decodedData1 = package.replace(/&#x27;/g, "'").replace(/&quot;/g, '"')
+                            const jsonData1 = decodedData1.replace(/'/g, '"')  // Optional: Replace single quotes with double quotes
+                            const packages = JSON.parse(jsonData1)
+
+                        // <----------------------------------------------------------------
+                                
+                            //<----
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">PACKAGES:</b></small>`
+                                result += `<ul class="list-group">`
+                                    
+                                    // computer packages like mouse,keyboard ups etc...
+                                    packages.qs_json2.forEach(pack => {
+                                    if (pack.item_code == item.item_code){
+                                        result += `<li class="list-group-item" style="padding:2px !important"><i class="ri-arrow-right-s-fill text-success"></i>`
+                                            result += ` <span class="${pack.status_served_name == 'Serve' ? 'badge bg-success': pack.status_served_name == 'Disposed' ? 'badge bg-danger': pack.status_served_name == 'For Disposal' ? 'badge bg-danger': pack.status_served_name == 'Vacant' ? 'badge bg-warning': ''}">
+                                                            ${pack.status_served_name} | ${pack.borrowed_for}
+                                                        </span>
+                                                        <span class="lass="breadcrumb-item active"><a href="#" id="subitem_${pack.subitems_id}" class="card-title" data-bs-toggle="modal" data-bs-target="#modalDialogScrollable" onclick="GetSubItemHistory('subitem_${pack.subitems_id}'); return false;">${pack.item_name} - ${pack.brand}</a></span>`
+                                        result += `</li>`
+                                        }
+                                    })
+                                    // computer packages like mouse,keyboard ups etc...
+
+                        result += `</ul>`
+                        result += `</li>` // ---->                          
+                        }
+                            result += `<li class="list-group-item li_a"><i class="ri-file-settings-fill text-primary"> </i><small><b class="card-title myHeader">MAINTENANCE SCHEDULE:</b>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><b class="text-primary" style="color: #012970 !important;">Date Schedule: ${ item.date_schedule_final }</b></li>`
+                                    result += `<li><b class="text-primary" style="color: #012970 !important;">Last Date Schedule: ${ item.last_date_maint }</b></li>`
+                                result += `</ul>`
+                            result += `</small></li>`
+                            // result += `<li class="list-group-item li_a"><i class="ri-map-pin-user-fill"></i><small><b class="card-title myHeader"> CURRENT CUSTODIAN:</b> </small> <ul class="ul_a"><li>${ item.custodian_name }</li></ul></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-user-location-fill" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> LOCATION:</b> </small> <ul class="ul_a"><li><b style="color: #012970 !important;">${ item.location }</b></li><li><b style="color: #012970 !important;">${ item.borrowed_for }</b></li></ul></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-calendar-check-line" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> DATE BORROWED:</b> </small> <ul class="ul_a"><li><b style="color: #012970 !important;">${ item.date_borrowed }</b></li></ul></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-calendar-check-line" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> ACQUISITION DATE:</b> </small> <ul class="ul_a"><li><b style="color: #012970 !important;">${ item.acquisition_date } </b></li></ul></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-list-check-2" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> RS NO:</b> </small><b style="color: #012970 !important;"> ${ item.rs_no }</b></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-list-check-2" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> BS NO:</b> </small><b style="color: #012970 !important;"> ${ item.bs_no }</b></li>`
+                            result += `<li class="list-group-item li_a"><i class="ri-list-check-2" style="color: #012970 !important;"></i><small><b class="card-title myHeader"> SERIAL NO:</b> </small><b style="color: #012970 !important;"> ${ item.serial_no } </b></li>`
+                            // result += `<li class="list-group-item li_a"><i class="ri-function-fill"></i><small><b class="card-title myHeader"> STATUS:</b> </small>`
+
+                            // result += `<span class="${item.status_served_name == 'Serve' ? 'badge bg-success': item.status_served_name == 'Disposed' ? 'badge bg-danger': item.status_served_name == 'For Disposal' ? 'badge bg-danger': item.status_served_name == 'Vacant' ? 'badge bg-warning': ''}">${ item.status_served_name }</span></li>`
+        
+                            
+                        result += `</ul>`  // ---------------------------------------------------------------->
+                    result += `</div>`
+
+                    // MODAL DIALOG FOR SUB ITEM PACKAGE
+                    result += `<div class="modal fade" id="modalDialogScrollable" tabindex="-1">
+                                <div class="modal-dialog modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title"><b class="card-title">SUB-ITEM BORROWED HISTORY</b></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="list-group" id="SubItemListId">                                                    
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                             
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- End Modal Dialog Scrollable-->`
+
+                    result += `<div class="card-footer">`
+                        if(item.status_served_name == 'For Disposal'){
+                            // hide btn here
+                        } else {
+                            result += `<a class="btn btn-outline-primary" style="margin-right:5px; margin-bottom:5px;" data-bs-toggle="modal" data-bs-target="#${ item.random_item_code_id }">Create Repair Order</a>`
+                        }            
+                        //result += `<a class="px-1" href="${url}"><span class="badge bg-warning rounded-pill" >Repair Order History</span></a>`
+                        result += `<a class="btn btn-primary mb-2" style="margin-bottom:5px;margin-right:5px;" href="${url}">Repair Order History <span class="badge bg-white text-primary">${item.no_of_repair_history}</span></a>`
+                        result += `<a class="btn btn-primary mb-2" style="margin-bottom:5px;" href="${borrower_history_url}">Borrower History <span class="badge bg-white text-primary">${ item.no_of_borrowed }</span></a>`
+
+                    result += `</div>`
+
+                    result += `<div class="modal fade" id="${item.random_item_code_id}" tabindex="-1">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Create Repair Order</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">`       
+                    result += ` <div class="alert alert-warning alert-dismissible fade show" role="alert" id="wowAlertID-${item.random_item_code_id}" style="display:none;">    
+                                </div>`
+                    result += `${floatingRepairOrderTransaction(item)}`
+                    result += `
+                                <!-- old buttons here -->
+                            </div> 
+                        </div>
+                        </div>
+                </div>`
+
+        return result                      
+   
+    }
+    
+</script>
+<!-- javascript for facilities -->
+
+{% endblock %}

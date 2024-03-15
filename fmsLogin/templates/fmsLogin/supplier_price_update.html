@@ -1,0 +1,146 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - Supplier Price Update</title>
+{% endblock title %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Supplier Price Update</h5>
+
+      <!-- List group with Advanced Contents -->
+      <div class="list-group" id="listgroupid">
+        <!-- content here -->
+      </div>
+      <!-- End List group Advanced Content -->
+      <div class="spinner-border" role="status" id="spinnerbox" style="display:block;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <a class="btn" style="background-color: #002349 !important; width: 100% !important; padding:0px !important; margin: 5px 0px" href="{% url 'recent_activities_history' %}" id="loadmorepriceupdateid"><small class="card-body" style="color:white !important; padding:3px !important">Load More Activities</small></a>
+    </div>
+</div>
+
+<!-- javascript for Supplier Price Update -->
+<script>
+    $(document).ready(function(){
+        
+        const loadmorepriceupdate   = document.getElementById('loadmorepriceupdateid')
+        const spinnerbox            = document.getElementById('spinnerbox')
+        const input                 = document.getElementById('search-bar-id')
+        const wrapper               = document.getElementById('listgroupid')
+        let counter = 0
+        let visible = 3
+
+        // Set the delay time (in milliseconds) for the debounce function
+        const delayTime     = 600; // Adjust the delay time as needed
+
+        // this function is for displaying data from database to html using javascript
+        function RECENT_SUPPLIER_PRICE_UPDATE(price_update){
+            let result = ``
+            const served_url = `/served/borrowed-items/1/${price_update[0].item_code}`
+
+            result = `<a href="${served_url}" class="list-group-item list-group-item-action" aria-current="true">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important"> ${price_update[0].item_name} - ${price_update[0].items}</h5>
+                            <small>${price_update[0].date}</small>
+                        </div>
+                        <p class="mb-1"><span class="badge bg-success">${price_update[0].price}</span></p>
+                        <small>RS Number: ${price_update[0].rs_no}</small>
+                        <br/><small>Supplier: ${price_update[0].supplier}</small>
+                        <br/><small>Type of Purchasing: ${price_update[0].type_of_purchasing}</small>
+                        <br/><small>Item Code: ${price_update[0].item_code}</small>
+                    </a>`      
+            return result
+        }
+
+        // declaration a ajax function by getting request
+        const handleGetData = (data) =>{  
+            $.ajax({
+            type: 'GET',
+            url: `/LoadSupplierPriceUpdate/${visible}/${data}`,
+            success: function(response){
+
+                const data = response.updated_price
+                const listofpriceupdate = document.getElementById('listgroupid')
+                const max = response.max
+                spinnerbox.style.display = 'block'
+
+                setTimeout(() =>{
+                    data.map(price_update=>{                   
+                        listofpriceupdate.innerHTML += RECENT_SUPPLIER_PRICE_UPDATE(price_update)   
+                        counter = counter + 1
+                    })
+                    spinnerbox.style.display = 'none'
+                },400)
+
+                // check if na load na ba tanan
+                if(max){
+                    loadmorepriceupdate.style.display = 'none'
+                }else{
+                    loadmorepriceupdate.style.display = 'inline-block'
+                }          
+
+            },
+            error: function(error){
+                console.log(error)
+            }
+        })
+        }
+
+        // this will call HandleGetData function and trigger
+        handleGetData()
+
+        // load more supplier price update
+        loadmorepriceupdate.addEventListener('click', (e)=>{
+            e.preventDefault()
+            
+            visible += 3
+
+            var search = document.getElementsByName("query")[0]
+            console.log(search.value)        
+
+            if (search.value === null || search.value.trim() === "") {
+                handleGetData() 
+            } else {
+                handleGetData(search.value.toUpperCase())  
+            }
+            
+        })
+        
+        // THIS FUNCTION IS FOR SEARCH BAR
+        function handleKeyUp(e) {
+
+            visible = 3
+            wrapper.innerHTML = ``
+            // let search = e.target.value.toUpperCase()
+            var search = document.getElementsByName("query")[0]
+            
+            if (search.value === null || search.value.trim() === "") {
+                handleGetData() 
+            } else {
+                handleGetData(search.value.toUpperCase())  
+            }
+
+            // if (counter === 0) {
+            //     row.innerHTML += myAlert('No items have been found!');
+            // }else{
+            //     row.innerHTML += `<a class="btn" style="background-color: #002349 !important" href=""><small class="card-title" style="color:white !important;">Load More</small></a>`
+            // }
+        }
+
+        function debounce(func, delay) {
+            let timer;
+            return function (...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        input.addEventListener('keyup', debounce(handleKeyUp, delayTime));
+    });
+
+</script>
+<!-- javascript for Supplier Price Update  -->
+{% endblock %}

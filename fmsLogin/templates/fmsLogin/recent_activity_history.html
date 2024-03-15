@@ -1,0 +1,170 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - Recent Activity History</title>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Recent Activities</h5>
+
+      <!-- List group with Advanced Contents -->
+      <div class="list-group" id="listgroupid">
+        <!-- <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">CPU - Acer  / DT-01</h5>
+            <small>3 days ago</small>
+          </div>
+          <p class="mb-1"><span class="badge bg-danger"> Under-Repair</span></p>
+          <small>Custodian: KJ Uayan</small>
+          <br/>
+          <small>Delivered By: Jophet B.</small>
+          <br/>
+          <small>Received By: Mc Johnson M.</small>
+
+        </a>
+        <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">CPU - Acer  / DT-01</h5>
+              <small>3 days ago</small>
+            </div>
+            
+            <p class="mb-1"><span class="badge bg-primary">Repaired</span></p>
+            <br/>
+            <small>Custodian: KJ Uayan</small>
+            <br/>
+            <small>Released To: John Mayer</small>
+            <br/>
+            <small>Repaired By: Jeoseph</small>
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">CPU - Acer / DT-02</h5>
+              <small>3 days ago</small>
+            </div>
+            <p class="mb-1"><span class="badge bg-success">Served</span></p>
+            <small>New Custodian: Ian Gil.</small>
+            <br/>
+            <small>Location: ITD</small>
+        </a>
+
+        <a href="#" class="list-group-item list-group-item-action" aria-current="true">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">CPU - Acer / DT-03</h5>
+              <small>3 days ago</small>
+            </div>
+            <p class="mb-1"><span class="badge bg-warning">Vacant</span></p>
+            <small>New Custodian: Ian Gil.</small>
+            <br/>
+            <small>Location: ITD</small>
+        </a> -->
+      </div><!-- End List group Advanced Content -->
+      <div class="spinner-border" role="status" id="spinnerbox" style="display:block;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <a class="btn" style="background-color: #002349 !important; width: 100% !important; padding:0px !important; margin: 5px 0px" href="{% url 'recent_activities_history' %}" id="loadmoreactivityid"><small class="card-body" style="color:white !important; padding:3px !important">Load More Activities</small></a>
+    </div>
+</div>
+
+<script>
+
+    const loadmoreactivity = document.getElementById('loadmoreactivityid')
+    const spinnerbox = document.getElementById('spinnerbox')
+
+    let visible = 3
+
+    function RECENT_ACTIVITY_LIST(activity){
+        let result = ``
+        const served_url = `/served/borrowed-items/1/${activity.item_code}`
+
+        if (activity.status == 'Under-Repair'){
+            result = `<a href="${served_url}" class="list-group-item list-group-item-action" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">${activity.item_name} - ${activity.brand}  / ${activity.item_code}</h5>
+                        <small>${activity.date_log} ago</small>
+                    </div>
+                    <p class="mb-1"><span class="badge bg-danger"> ${activity.status}</span></p>
+                    <small>Custodian: ${activity.custodian_name}</small>
+                    <br/><small>Problem Encountered: ${activity.problem_encountered}</small>
+                    <br/>
+                    <small>Received By: ${activity.received_by}</small></a>`
+        }
+        else if(activity.status == 'Repaired'){
+            result = `<a href="${served_url}" class="list-group-item list-group-item-action" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">${activity.item_name} - ${activity.brand}  / ${activity.item_code}</h5>
+                        <small>${activity.date_log} ago</small>
+                    </div>
+                    <p class="mb-1"><span class="badge bg-primary"> ${activity.status}</span></p>
+                    <small>Custodian: ${activity.custodian_name}</small>
+                    <br/><small>Details Work Done: ${activity.details_work_done}</small>
+                    <br/>
+                    <small>Repaired By: ${activity.repaired_by}</small></a>`
+        }
+        else if (activity.status == 'Serve'){
+            result = `<a href="${served_url}" class="list-group-item list-group-item-action" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1 card-title" style="padding:5px 0 15px 0 !important">${activity.item_name} - ${activity.brand}  / ${activity.item_code}</h5>
+                        <small>${activity.date_log} ago</small>
+                    </div>
+                    <p class="mb-1"><span class="badge bg-success"> ${activity.status}</span></p>
+                    <small>Custodian: ${activity.custodian_name}</small>
+                    <br/><small>Location: ${activity.location}</small>
+                    <br/>
+                    <small>BS No:</small></a>`
+        }
+        return result
+
+    }
+
+    const handleGetData = () =>{
+        $.ajax({
+        type: 'GET',
+        url: `/load_recent_activities_history/${visible}`,
+        success: function(response){
+            const data = response.recent_activities
+            const listofactivities = document.getElementById('listgroupid')
+            const max = response.max
+            spinnerbox.style.display = 'block'
+
+            setTimeout(() =>{
+                data.map(activity=>{
+                console.log(activity)
+
+                listofactivities.innerHTML += RECENT_ACTIVITY_LIST(activity)            
+                                         
+                })
+                spinnerbox.style.display = 'none'
+            },400)
+
+            if(max){
+                loadmoreactivity.style.display = 'none'
+            }
+            
+
+        },
+        error: function(error){
+            console.log(error)
+        }
+    })
+
+    }
+
+    handleGetData()
+
+    loadmoreactivity.addEventListener('click', (e)=>{
+        e.preventDefault()
+        
+        visible += 3
+        handleGetData()
+        
+       
+    })
+      
+</script>
+
+{% endblock %}
+

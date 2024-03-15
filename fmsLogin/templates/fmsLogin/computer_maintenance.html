@@ -1,0 +1,54 @@
+
+{% extends 'base/base.html' %}
+{% load static %}
+
+
+{% block title %}
+<title>FMS - Computer Maintenance Cleaning</title>
+{% endblock %}
+
+{% block content %}
+{% for x in maintenance_checklist %}
+
+<div class="card">
+    <div class="card-body">
+        <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
+        <i class="bi-folder-symlink-fill text-success"></i><h5 class="card-title" style="margin:0px 0 0 5px;">EMD</h5>
+        </div>
+    </div>
+    
+      
+      <div style="width:100%">
+        <div class="row">
+            <div class="col-sm">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title" style="margin-bottom: -1.25rem !important"><i class="ri-checkbox-multiple-fill"></i> {{ x.cat_name.upper }} - {{ x.item_name.upper }}</p>
+                        <span class="badge bg-success" style="margin-right:2px">PERFORM BY: {{ x.performed_by.upper }}</span>
+                        <span class="badge bg-success" style="margin-right:2px">{{ x.item_code}}</span>
+                        <span class="badge bg-success" style="margin-right:2px">CUSTODIAN: {{ x.custodian_name.upper }}</span>
+                            <br><small><b>DATE SCHEDULE: {{ x.date_schedule }}</b></small>
+                            <br><small><b>DATE MAINT: {{ x.date_maint }}</b></small>
+        
+                    <!-- List group With Icons -->
+                        <ul class="list-group">
+                            {% for checklist in maintenance_checklist_details %}
+                                {% if x.fac_maint_id == checklist.fac_maint_id %}
+                                    {% if checklist.status_col_no == 1 %}
+                                        <li class="list-group-item"><i class="bi bi-toggle-on me-1 text-success"></i> {{checklist.Activity}} <br><small>{{ checklist.Notes }}</small></li>          
+                                    {% elif checklist.status_col_no == 0 %}
+                                    <li class="list-group-item"><i class="bi bi-toggle-off me-1 text-success"></i> {{checklist.Activity}} <br><small>checklist.Notes</small></li>          
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </ul><!-- End List group With Icons -->
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+{% endblock %}

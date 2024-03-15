@@ -1,0 +1,57 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - List of Facilities</title>
+{% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body" id="cardbodyID" style="padding-right:0px !important; padding-left:0px !important"><br/>
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{% static 'images/IMG_7592.jpeg' %}" class="img-fluid rounded-start" alt="..." onerror="this.src='{% static 'assets/img/coming_soon.jpg' %}'">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">COMPUTER DESKTOP</h5>
+                            <p class="card-title" style="margin-bottom: -1.25rem !important"><i class="ri-checkbox-multiple-fill"></i> Computer Desktop - Core i5 DDR4</p>
+                            <p class= "card-body">
+                                <span class='badge bg-warning' style="margin-right:2px">
+                                    Status Serve Name
+                                </span>
+                                <span class="badge bg-danger">
+                                    Repair Status
+                                </span>
+                                <span class="badge bg-info">Custodian: Custodian Name</span>
+                            </p>
+
+                            <p class="card-title" style="margin-bottom: -1.25rem !important"><i class="ri-checkbox-multiple-fill"></i> Packages </p>
+                            <p class= "card-body">
+                                <span class="badge bg-primary">CPU</span>
+                                <span class="badge bg-primary">MONITOR - ACER</span>
+                                <span class="badge bg-primary">KEYBOARD - RAZOR</span>
+                                <span class="badge bg-primary">MOUSE - A4 TECH</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="cardID">
+            <div class="card-header" style="margin-bottom:10px;">Item Code</div>
+            <div class="card-body">
+                <h5 class="card-title"><i class="ri-checkbox-multiple-fill"></i> ${ item.item_name } - ${ item.brand }</h5>
+                <ul class="list-group">
+                </ul>
+            </div>
+        </div>
+    
+    </div>  
+
+
+
+{% endblock %}

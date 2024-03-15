@@ -1,0 +1,105 @@
+
+{% extends 'base/base.html' %}
+{% load static %}
+
+
+{% block title %}
+<title>FMS - Borrowed History</title>
+{% endblock %}
+
+{% block content %}
+
+<div class="pagetitle">
+    <h1><i class="ri-checkbox-multiple-fill"></i> {{ item_code }}</h1>
+</div><!-- End Page Title -->
+
+{% for m in mto %}
+<div class="card">
+    <div class="row">
+        <div class="col-sm">
+            <div class="card-body" id="cardbodyID">
+                <!-- <h5 class="card-title"> DATE BORROWED: 08-05-2023 </h5> -->
+                <br/>
+                <!-- packages -->
+                <ul class="list-group">
+                  
+                    <li class="list-group-item li_a"><small><b class="card-title myHeader">PACKAGES:</b></small>
+                        {% for x in borrower_history %}    
+                            {% if m.mto_no == x.mto_no %}  
+                            <ul class="ul_a">
+                                <li><i class="ri-arrow-right-s-fill"></i><b class="card-title myHeader"> {{ x.item_name }} | {{ x.brand }}</b> </li>
+                            </ul>
+                            {% endif %}
+                        {% endfor %}        
+                    </li> 
+                         
+                </ul>
+
+                <br/>
+
+                {% for x in borrower_info %}
+                    {% if m.mto_no == x.mto_no %} 
+                        <ul class="list-group">
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">DATE BORROWED: </b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-calendar-check-fill text-secondary"></i> {{ x.date_borrowed }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">MTO NO.</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-account-circle-line text-secondary"></i> {{ m.mto_no }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">CUSTODIAN:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-user-2-fill text-secondary"></i> {{ x.custodian }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">LOCATION:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-map-pin-user-fill text-secondary"></i> {{ x.location }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">DEPARTMENT:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-arrow-right-s-fill text-secondary"></i> {{ x.department }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">TURNOVER TO:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-user-received-2-fill text-secondary"></i> {{ x.turnover_to }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">DATE TURNOVER:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-calendar-check-fill text-secondary"></i> {{ x.date_turnover }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">TURNOVER LOCATION:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-arrow-right-s-fill text-secondary"></i> {{ x.turnover_location }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">SUBMITTED DATE:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-calendar-check-fill text-secondary"></i> {{ x.submitted_date }} </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item li_a"><small><b class="card-title myHeader">NOTED BY:</b></small>
+                                <ul class="ul_a">
+                                    <li><i class="ri-arrow-right-s-fill text-secondary"></i> {{ x.noted_by }} </li>
+                                </ul>
+                            </li>
+
+                        </ul>      
+                    {% endif %}         
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>   
+</div>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends 'base/base.html' %} {% load static %} {% block title %}
+<title>FMS - List Of Facilities</title>
+{% endblock %} {% block content %}
+<div class="card-body" id="fac_id">
+  <div
+    class="alert alert-info alert-dismissible fade show"
+    role="alert"
+    id="fiid"
+    style="display: none"
+  >
+    5 items has been found...
+  </div>
+</div>
+
+<div
+  class="alert alert-success alert-dismissible fade show"
+  role="alert"
+  id="maximumdata_id"
+  style="display: none"
+>
+  You've reached the maximum size!
+</div>
+<div class="container" style="width: 300px !important">
+  <a
+    class="btn btn-secondary rounded-pill"
+    style="color: white !important"
+    id="loadmoreid"
+    >Load More Data</a
+  >
+
+  <div
+    class="spinner-border float-left mr-3"
+    role="status"
+    id="spinnerbox"
+    style="display: none"
+  >
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<script>
+  // const category = '{{ category }}';
+  // const cardbody = document.getElementById('fac_id');
+  // const facilities = new Facilities();
+  // const csrf_token = '{{ csrf_token }}';
+  // facilities.fac_data(category,5,cardbody,csrf_token);
+
+  // const facilities_new = new ListOfFacilities(category,5,cardbody,csrf_token);
+  // facilities_new.facility();
+  // console.log(facilities_new.data);
+
+  // // console.log(modal)
+
+  // Example usage
+
+  // PAGE LOAD FIRST
+  document.addEventListener("DOMContentLoaded", function () {
+    const category = "{{ category }}";
+    const item_code = "{{ item_code }}";
+    // const facilities_type = "{{ facilities_type }}";
+
+    const cardbody = document.getElementById("fac_id");
+    const csrf_token = "{{ csrf_token }}";
+
+    const spinnerbox = document.getElementById("spinnerbox");
+    const maxdataAlert = document.getElementById("maximumdata_id");
+    const foundItemAlert = document.getElementById("fiid");
+    const input = document.getElementById("search-bar-id");
+    // Set the delay time (in milliseconds) for the debounce function
+    const delayTime = 600; // Adjust the delay time as needed
+
+    function debounce(func, delay) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // Use async-await or handle the data inside the callback
+    const facilities_new = new ListOfFacilities(
+      slugify(category),
+      5,
+      cardbody,
+      csrf_token,
+      spinnerbox,
+      maxdataAlert,
+      foundItemAlert,
+      input
+    );
+
+    facilities_new.fetchData(item_code);
+    facilities_new.EventLoadMore();
+
+    // THIS FUNCTION IS FOR SEARCH BAR
+    function handleKeyUp(e) {
+      maxdataAlert.style.display = "none";
+
+      var search = document.getElementsByName("query")[0];
+
+      if (search.value === null || search.value.trim() === "") {
+        cardbody.innerHTML = "";
+        facilities_new.setVisible(5);
+        facilities_new.search = "";
+
+        facilities_new.fetchData();
+      } else {
+        cardbody.innerHTML = "";
+        facilities_new.setVisible(5);
+        facilities_new.search = search.value;
+
+        facilities_new.fetchData(search.value);
+      }
+    }
+
+    input.addEventListener("keyup", debounce(handleKeyUp, delayTime));
+
+    // async function fetchData() {
+
+    //     await facilities_new.facility();
+    //     await facilities_new.applyDesign();
+    //     await facilities_new.EventSaveRo();
+    //     await facilities_new.EventLoadMore();
+    // }
+
+    // fetchData();
+  });
+</script>
+{% endblock content %}

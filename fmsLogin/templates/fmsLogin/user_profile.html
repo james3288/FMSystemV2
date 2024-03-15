@@ -1,0 +1,198 @@
+
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - Maintenance</title>
+{% endblock %}
+
+{% block content %}
+<section class="section profile">
+    <div class="row">
+      <div class="col-xl-12 lg-12">
+
+        <div class="card">
+          <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
+            {% if request.session.gender == 'Male' %}
+              <img src="{% static 'assets/img/messages-3.jpg' %}" alt="" class="rounded-circle">
+            {% else %}
+              <img src="{% static 'assets/img/messages-2.jpg' %}" alt="" class="rounded-circle">
+            {% endif %}
+            <!-- <img src="{% static 'assets/img/man.png' %}" alt="Profile" class="rounded-circle" onerror="this.src='{% static 'assets/img/man.png' %}'"> -->
+            <h2>{{ request.session.fname|add:" "|add:request.session.lname }}</h2>
+            <h3>{{ request.session.position }}</h3>
+            <div class="social-links mt-2">
+              <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+              <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-xl-12 lg-12">
+        <div class="card">
+          <div class="card-body pt-3">
+            <!-- Bordered Tabs -->
+            <ul class="nav nav-tabs nav-tabs-bordered" role="tablist">
+
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-overview" aria-selected="true" role="tab">Overview</button>
+              </li>
+
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#profile-edit" aria-selected="false" role="tab" tabindex="-1">Category</button>
+              </li>
+            </ul>
+
+            <div class="tab-content pt-2">
+              <!-- PROFILE TAB -->
+              <div class="tab-pane fade profile-overview" id="profile-overview" role="tabpanel">
+                <h5 class="card-title">About</h5>
+                <p class="small fst-italic">Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.</p>
+
+                <h5 class="card-title">Profile Details</h5>
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label ">Full Name</div>
+                  <div class="col-lg-9 col-md-8">{{ request.session.fname|add:" "|add:request.session.lname }}</div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Company</div>
+                  <div class="col-lg-9 col-md-8">Adfil Corporation</div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Job</div>
+                  <div class="col-lg-9 col-md-8">{{ request.session.position }}</div>
+                </div>
+
+                <div class="row">
+                  <div class="col-lg-3 col-md-4 label">Email</div>
+                  <div class="col-lg-9 col-md-8">sampleonly@gmail.com</div>
+                </div>
+
+              </div>
+
+              {% if request.session.user_id == 91 %}
+              <!-- UPLOAD THUMBNAIL TAB -->
+              <div class="tab-pane fade profile-edit pt-3 active show" id="profile-edit" role="tabpanel">
+               
+                {% for facility in facilities %}         
+                <div class="card">
+                  <div class="card-body">
+                    <!-- <h5 class="card-title">{{ facility }}</h5> -->
+                   
+                    <div class="card mb-3 mt-3">
+                      <div class="row g-0">
+                        {% if uploaded and category_uploaded == facility %}
+                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                          Successfully Uploaded!
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4">
+                    
+                          {% for img in thumbnail %}
+                            {% if img.category == facility %}
+                              {% if img.thumbnail == None %}
+                                <img src="{% static 'assets/img/coming_soon.jpg' %}" class="card-img-top" id="{{ facility }}" style="max-width:100% !important">
+                              {% else %}
+                                <img src="{% static img.thumbnail.url %}" class="card-img-top" id="{{ facility }}" style="max-width:100% !important">
+                                <!-- <img src="{% static img.thumbnail.url %}" class="card-img-top" id="{{ facility }}"> -->
+                              {% endif %}
+                            <!-- <img src="{% static 'assets/img/' %}{{ facility }}{{ '.jpg' }}" class="card-img-top" onerror="this.src='{% static 'assets/img/coming_soon.jpg' %}'"> -->
+                             
+                            {% endif %}
+                          {% endfor %}
+                       
+                        </div>
+                        <div class="col-md-8">
+                          <div class="card-body">
+                            <h5 class="card-title">{{ facility }}</h5>
+                            <p class="card-text">Adfil Property</p>
+                            <!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p> -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- General Form Elements -->
+                    <form id="upload-form" method="POST" enctype="multipart/form-data">
+                      <!-- <div class="row mb-3">
+                        <label for="inputText" class="col-sm-2 col-form-label">Category</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control">
+                        </div>
+                      </div> -->
+                      {% csrf_token %}
+
+                      <div class="row mb-3">
+                        <label for="inputNumber" class="col-sm-2 col-form-label">Category</label>
+                        <div class="col-sm-10">
+                          <input class="form-control" type="text" id="formText" name="category" value="{{ facility }}" readonly>
+                        </div>
+                      </div> 
+
+                      <div class="row mb-3">
+                        <label for="inputNumber" class="col-sm-2 col-form-label">File Upload</label>
+                        <div class="col-sm-10">
+                          <input required class="form-control" type="file" id="formFile" name="image">
+                        </div>
+                      </div> 
+                      
+                      <div class="row mb-3">
+                        <label class="col-sm-2 col-form-label"></label>
+                        <div class="col-sm-10">
+                          <button type="submit" class="btn btn-primary">Save/Update</button>
+                        </div>
+                      </div>
+      
+                    </form><!-- End General Form Elements -->
+      
+                  </div>
+                </div>
+
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+</section>
+
+<script>
+
+
+ document.addEventListener("DOMContentLoaded", function() {
+    // Scroll to the element with the specified ID
+
+    const uploaded = '{{ uploaded }}'
+    const category_uploaded = '{{ category_uploaded }}'
+
+    //SCROLL AUTOMATICALLY
+    function scrollToElement(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            var elementPosition = element.getBoundingClientRect().top + window.scrollY;
+            var centerYPosition = elementPosition - (window.innerHeight / 2); // Scroll to center of the element
+            window.scrollTo({ top: centerYPosition, behavior: 'smooth' });
+        }
+    }
+
+    // Call the function to scroll to the element after the page loads
+    if(uploaded == 'True'){
+      scrollToElement(category_uploaded);
+    }
+    
+});
+</script>
+
+{% endblock %}

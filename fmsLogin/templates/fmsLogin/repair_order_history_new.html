@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - List Of Repair Order History</title>
+{% endblock title %}
+
+{% block content %}
+<div class="card-body" id="fac_id">    
+</div>
+
+<script>
+
+// PAGE LOAD FIRST
+document.addEventListener('DOMContentLoaded', function() {
+    
+    const category = '{{ category }}';
+    const item_code = '{{ item_code }}';
+    const visible = 3;
+    const search = 'none';
+    const cardbody = document.getElementById('fac_id');
+
+    const repairOrder = new RepairOrder(category,item_code,visible,search,cardbody);
+    data = repairOrder.fetchData();
+
+});
+
+</script>
+{% endblock content %}

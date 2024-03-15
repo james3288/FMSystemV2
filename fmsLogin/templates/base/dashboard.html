@@ -1,0 +1,27 @@
+{% load static %}
+<section class="section dashboard">
+  <div class="row">
+
+    <!-- Left side columns -->
+    <div class="{% if pages == 'Dashboard' %}col-lg-8{% elif pages == 'User Profile' %}col-lg-8{% else %}col-lg-12{% endif %}">
+      <div class="row" id="rowID">
+        <!-- Content Section-->
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div><!-- End Left side columns -->
+
+    <!-- Right side columns -->
+    <div class="col-lg-4">
+
+      <!-- Recent Activity -->
+      {% block activity %}
+      {% endblock activity %}
+      
+      <!-- End Recent Activity -->
+
+      {% block charts %}
+      {% endblock charts %}
+
+  </div>
+</section>

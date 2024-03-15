@@ -1,0 +1,297 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+<title>FMS - Repair-order History</title>
+{% endblock %}
+
+{% block content %}
+<div class="pagetitle">
+    <h1>{{pages}}</h1>
+    <nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="">Home</a></li>
+        <li class="breadcrumb-item"><a href="">{{category}}</a></li>
+        <li class="breadcrumb-item active">{{item_code}}</li>
+    </ol>
+    </nav>
+</div><!-- End Page Title -->
+
+<div id='csrfData' data-csrf='{{ csrf_token }}'></div>
+
+<script>
+
+    const roh_json = '{{ repair_order_history_json }}'
+    const rot_json = '{{ repair_order_turnover_json }}'
+
+    const item_code = '{{ item_code }}'
+
+    const decodedData = roh_json.replace(/&#x27;/g, "'").replace(/&quot;/g, '"')
+    const jsonData = decodedData.replace(/'/g, '"')  // Optional: Replace single quotes with double quotes
+    const parsedData = JSON.parse(jsonData) 
+
+    const row = document.getElementById('rowID')
+
+    row.innerHTML = "<div id='csrfData' data-csrf='{{ csrf_token }}'></div>";
+    
+    parsedData.roh_json.forEach(item => { 
+        if(item.item_code.toUpperCase() == item_code.toUpperCase() && item.turnovered == 'True'){
+            
+            row.innerHTML += RepairOrderHistoryHTML(item)   
+
+        }else if(item.item_code.toUpperCase() == item_code.toUpperCase()){
+
+            row.innerHTML += RepairOrderHistoryHTML(item)         
+                
+        }else if(item_code.toUpperCase() == 'ALL' && item.turnovered == 'False'){
+         
+            row.innerHTML += RepairOrderHistoryHTML(item)         
+        }
+        
+        CreateTurnover_OnClick(item)
+    })
+
+    function CreateTurnover_OnClick(item){
+        $(document).on('submit','#form-' + item.random_repair_order_id, function(e){
+            e.preventDefault();
+
+            const btnTurnoverSave = document.getElementById('floatingBtnTurnover-' + item.random_repair_order_id)
+            if (btnTurnoverSave.innerText == 'Save'){
+                DateTurnoverSaveForm(item.random_repair_order_id,'save',item.random_repair_order_id)   
+
+            }else{
+
+                DateTurnoverSaveForm(item.random_repair_order_id,'update', item.rep_released_id) 
+
+            }
+
+        })
+            
+    }
+
+    function RepairOrderHistoryHTML(item){
+
+        result = `<div class="card">`
+            result += `<div class="row">`
+                result += `<div class="col-sm">`
+                    result += `<div class="card-body" id="cardbodyID">`
+                        result += `<h5 class="card-title"> DATE DELIVERED: ${ item.delivered_date }</h5>`
+                        result += `<ul class="list-group">`
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Repair Order #</b></small>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.repair_order_no }</li>`
+                                result += `</ul>`
+                            result += `</li>`
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Problem Encountered</b></small>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.problem_encountered }</li>`
+                                result += `</ul>`
+                            result += `</li>`
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Custodian</b></small>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.custodian_name }</li>`
+                                result += `</ul>`
+                            result += `</li>`
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Delivered By</b></small>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.delivered_by }</li>`
+                                result += `</ul>`
+                            result += `</li>`
+                            result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Received By</b></small>`
+                                result += `<ul class="ul_a">`
+                                    result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.received_by }</li>`
+                                result += `</ul>`
+                            result += `</li>`
+                        result += `</ul>`
+                        result += `<br/>`
+                        result += `<button type="button" class="btn btn-primary btn-sm" style="margin-right:5px;">Edit Repair Transaction</button>`
+                
+                    if(item.turnovered == 'False'){
+                        result += `<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#${ item.random_repair_order_id }">Create Turnover</button>`
+                    }
+                    result += `</div>`
+                result += `</div>`
+    
+                //TURNOVER DIV
+                const decodedData2 = rot_json.replace(/&#x27;/g, "'").replace(/&quot;/g, '"')
+                const jsonData2 = decodedData2.replace(/'/g, '"')  // Optional: Replace single quotes with double quotes
+                const parsedData2 = JSON.parse(jsonData2) 
+
+                parsedData2.rot_json.forEach(item2 => { 
+                    if(item2.repair_order_id == item.repair_order_id){
+                       
+                        result += RepairOrderTurnoverHTML(item2)
+                        //EditTurnover_OnClick(item2)
+                            
+                    }
+                })
+
+                //END TURNOVER DIV
+            result += `</div>`
+
+            result += FloatingTurnoverTransaction(item)
+        result += `</div>`
+        return result
+    }
+
+    function RepairOrderTurnoverHTML(item){
+         //TURNOVER
+        result = `<div class="col-sm">`
+            result += `<div class="card-body" id="cardbodyID">`
+                result += `<h5 class="card-title"> DATE TURNOVER: ${ item.released_date }</h5>`
+                result += `<ul class="list-group">`
+                    result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Details Work Done</b></small>`
+                        result += `<ul class="ul_a">`
+                            result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.details_work_done }</li>`
+                        result += `</ul>`
+                    result += `</li>`
+                    result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Released To</b></small>`
+                        result += `<ul class="ul_a">`
+                            result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.released_to }</li>`
+                        result += `</ul>`
+                    result += `</li>`
+                    result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Repaired By</b></small>`
+                        result += `<ul class="ul_a">`
+                            result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.repaired_by }</li>`
+                        result += `</ul>`
+                    result += `</li>`
+                    result += `<li class="list-group-item li_a"><small><b class="card-title myHeader">Status</b></small>`
+                        result += `<ul class="ul_a">`
+                            result += `<li><i class="ri-arrow-right-s-fill"></i> ${ item.status }</li>`
+                        result += `</ul>`
+                    result += `</li>`
+                result += `</ul>`
+                result += `</br>`
+                result += `<button type="button" class="btn btn-primary btn-sm" id="btn-${ item.repair_order_id }" data-bs-toggle="modal" data-bs-target="#${item.repair_order_id}" onclick="${EditRepairTurnover(item)}">Edit Turnover</button>`
+            result += `</div>`  
+        result += `</div>`
+        // END TURNOVER
+                   
+        return result
+    }
+
+    function FloatingTurnoverTransaction(item){
+        var csrfToken = document.querySelector('#csrfData').getAttribute('data-csrf')
+
+        result = `<div class="modal fade" id="${item.random_repair_order_id}" tabindex="-1">`
+            result += `<div class="modal-dialog modal-dialog-scrollable">`
+                result += `<div class="modal-content">`
+                    result += `<div class="modal-header">`
+                        result += `<h5 class="modal-title">Create Repair Turnover</h5>`
+                        result += `<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>`
+                    result += `</div>`
+
+                    result += `<div class="modal-body">`
+                        // ALERT
+                        result += `<div class="alert alert-warning alert-dismissible fade show" role="alert" id="wowAlertID-${ item.random_repair_order_id }" style="display:none;">`
+                        result += `</div>`
+                        //FLOATING LABEL FORM
+                        result += `<form class="row g-3" id="form-${item.random_repair_order_id}">`
+                            //HIDDEN DATA
+                            // result += `<div class="col-md-12" style="display:none;">`
+                            //     result += `<div class="form-floating">`
+                            //         result += `<input type="text" class="form-control" id="repair_order_id" placeholder="Repair Order ID" value="${ item.random_repair_order_id }" name="repair_order_id">`
+                            //         result += `<label for="repair_order_id">Item Code ID</label>`
+                            //     result += `</div>`
+                            // result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`   
+                                    result += `<input type="text" class="form-control" id="floatDetailsWorkDone" placeholder="Details Work Done" value="" name="details_work_done">`            
+                                    result += `<label for="floatDetailsWorkDone">Details Work Done</label>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`
+                                    result += `<input type="text" class="form-control" id="floatingReleasedTo" placeholder="Released To" name="released_to">`
+                                    result += `<label for="floatingReleasedTo">Released To</label>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`
+                                    result += `<input type="text" class="form-control" id="floatingRepairedBy" placeholder="Repaired By" name="repaired_by">`
+                                    result += `<label for="floatingRepairedBy">Repaired By</label>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`
+                                    result += `<select class="form-select" aria-label="Default select example" id="floatingStatus" placeholder="Repaired By" name="status">`
+                                        result += `<option value="" selected disabled>Status</option>`
+                                        result += `<option value="Repaired">Repaired</option>`
+                                        result += `<option value="Defective">Defective</option>`
+                                    result += `</select>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`
+                                    result += `<input type="date" class="form-control" id="floatingTurnoverDate" name="turnover_date">`
+                                    result += `<label for="floatingTurnoverDate">Date Released</label>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="col-md-12">`
+                                result += `<div class="form-floating">`
+                                    result += `<input type="date" class="form-control" id="floatingRepairedDate" name="repaired_date">`
+                                    result += `<label for="floatingRepairedDate">Date Repaired</label>`
+                                result += `</div>`
+                            result += `</div>`
+
+                            result += `<div class="text-center"></div>`
+
+                            result += `<div class="modal-footer">`
+                                result += `<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>`
+                                result += `<button type="submit" class="btn btn-primary" id="floatingBtnTurnover-${ item.random_repair_order_id }">Save</button>`
+                            result += `</div>`
+
+                        result += `</form>`
+                    result += `</div>`
+                result += `</div>`
+            result += `</div>`
+        result += `</div>`
+        
+        // $(document).on('submit','#form-' + item.random_item_code_id, function(e){
+        //     e.preventDefault();
+        //     console.log(item)
+        // })
+
+        return result
+    }
+
+    function EditRepairTurnover(param){
+     
+        $(document).on('click','#btn-'+param.repair_order_id, function(e){
+            const formElement       = document.getElementById('form-' + param.repair_order_id)
+            const inputElements     = formElement.querySelectorAll('input, select')
+            const btnTurnover       = document.getElementById('floatingBtnTurnover-' + param.repair_order_id)
+
+            inputElements.forEach((inputElement) => {
+                // console.log(param)
+                if(inputElement.id == 'floatDetailsWorkDone'){ inputElement.value =  param.details_work_done }
+                else if(inputElement.id == 'floatingReleasedTo'){ inputElement.value = param.released_to }
+                else if(inputElement.id == 'floatingRepairedBy'){ inputElement.value = param.repaired_by }
+                else if(inputElement.id == 'floatingStatus'){ inputElement.value = param.status }
+                else if(inputElement.id == 'floatingTurnoverDate'){ inputElement.value = formatDate2(param.released_date) }
+                else if(inputElement.id == 'floatingRepairedDate'){ inputElement.value = formatDate2(param.date_repaired) }
+            })
+
+            btnTurnover.innerText = "Update Repair Turnover"
+
+        })
+    }
+
+    function formatDate2(inputDate) {
+        const date = new Date(inputDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        
+        return `${year}-${month}-${day}`;
+    }
+</script>
+
+{% endblock %}
+
